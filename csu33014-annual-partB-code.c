@@ -19,25 +19,45 @@ are added to the frontier so in order from lowest kernal to highest kernal. This
 people in our frontier and keep a list of our visited people in visisted people.
 When an acquaintances is found it is checked if the person has already been visited. if so then the person is not interacted with further.
 If it hasn't been found then it is added to the frontier and placed with relation to it's number of steps. 
-Our frontier will be a dynamic array which we can add to and sort. The List of visited will also be a dynamic array. 
+Our frontier will be a FIFO stack which we will be added to by all aquantances being . The List of visited will also be a dynamic array. 
 */
 
-void find_reachable_recursive(struct person *frontier, int steps_remaining,
-                              bool *reachable, struct person *visited)
+void push(struct person *frontier, int frontierSize, struct person *new_member,
+          int index)
 {
-  // mark current root person as reachable
-  reachable[person_get_index(current)] = true;
-  //add to visited.
+  realloc(frontier, sizeof(arr) + 1);
+}
 
+void find_reachable_recursive(struct person *frontier, int steps_remaining,
+                              bool *reachable, int frontiersize)
+{
+  // deal with all users on the frontier
+  for (int i = 0; i < frontiersize; i++)
+  {
+    reachable[person_get_index(frontier[i])] = true;
+  }
+  // mark current root person as reachable
   // now deal with this person's acquaintances
   if (steps_remaining > 0)
   {
-    int num_known = person_get_num_known(current);
-    for (int i = 0; i < num_known; i++)
+    struct person *newfrontier;
+    int newFrontierSize = 0; // keep track of new frontier size.
+    for (int j = 0; j < frontiersize; j++)
     {
-      struct person *acquaintance = person_get_acquaintance(current, i);
-      find_reachable_recursive(acquaintance, steps_remaining - 1, reachable);
+      int num_known = person_get_num_known(frontier[j]);
+      for (int i = 0; i < num_known; i++)
+      {
+        struct person *acquaintance = person_get_acquaintance(current, i);
+        if (reachable[person_get_index(acquaintance)] == false) // found new member
+        {
+          realloc(frontier, sizeof(frontier) + sizeof(struct person)); // expand the frontier.
+          newFrontierSize++;
+          frontier[newFrontierSize - 1] = acquaintance;
+        }
+      }
     }
+    free(frontier);
+    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize);
   }
 }
 
@@ -46,20 +66,17 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
 {
   bool *reachable;
   int count;
+  int size_of_frontier = 0;                                // keep track of the size of the frontier.
   struct person *frontier = malloc(sizeof(struct person)); // create a frontier.
   frontier[0] = start;
-  print(frontier[0]);
-  struct person *visited = malloc(sizeof(struct person)); // create a list of visited people.
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
   for (int i = 0; i < total_people; i++)
   {
     reachable[i] = false;
   }
-
   // now search for all people who are reachable with k steps
   find_reachable_recursive(frontier, k, reachable, visited);
-
   // all visited people are marked reachable, so count them
   count = 0;
   for (int i = 0; i < total_people; i++)
