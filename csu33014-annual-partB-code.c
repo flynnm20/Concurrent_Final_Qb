@@ -19,7 +19,7 @@ are added to the frontier so in order from lowest kernal to highest kernal. This
 people in our frontier and keep a list of our visited people in visisted people.
 When an acquaintances is found it is checked if the person has already been visited. if so then the person is not interacted with further.
 If it hasn't been found then it is added to the frontier and placed with relation to it's number of steps. 
-Our frontier will be a FIFO stack which we will be added to by all aquantances being . The List of visited will also be a dynamic array. 
+Our frontier will be a FIFO stack which we will be added to by all aquantances being. The List of visited will also be a dynamic array. 
 */
 
 void find_reachable_recursive(struct person **frontier, int steps_remaining,
@@ -38,8 +38,7 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
     int newFrontierSize = 0; // keep track of new frontier size.
     for (int j = 0; j < frontiersize; j++)
     {
-      struct person *current_person = frontier[j];
-      int num_known = person_get_num_known(current_person);
+      int num_known = person_get_num_known(frontier[j]);
       for (int i = 0; i < num_known; i++)
       {
         struct person *acquaintance = person_get_acquaintance(current_person, i);
@@ -51,6 +50,7 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
       }
     }
     free(frontier);
+    printf(newFrontierSize);
     find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize);
   }
 }
