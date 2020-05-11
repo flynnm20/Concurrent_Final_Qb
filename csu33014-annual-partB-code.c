@@ -43,7 +43,7 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
 {
   bool *reachable;
   int count;
-  frontier = malloc(sizeof(struct person)); // create a frontier.
+  struct person *frontier = malloc(sizeof(struct person)); // create a frontier.
 
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
