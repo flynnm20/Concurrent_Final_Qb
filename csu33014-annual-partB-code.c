@@ -22,9 +22,8 @@ If it hasn't been found then it is added to the frontier and placed with relatio
 Our frontier will be a dynamic array which we can add to and sort. The List of visited will also be a dynamic array. 
 */
 
-void find_reachable_recursive(struct person *current, int steps_remaining,
-                              bool *reachable, struct person *frontier,
-                              struct person *visited)
+void find_reachable_recursive(struct person *frontier, int steps_remaining,
+                              bool *reachable, struct person *visited)
 {
   // mark current root person as reachable
   reachable[person_get_index(current)] = true;
