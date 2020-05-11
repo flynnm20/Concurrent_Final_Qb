@@ -23,7 +23,7 @@ Our frontier will be a FIFO stack which we will be added to by all aquantances b
 */
 
 void find_reachable_recursive(struct person **frontier, int steps_remaining,
-                              bool *reachable, int frontiersize)
+                              bool *reachable, int frontiersize, int count)
 {
   // now deal with this person's acquaintances
   if (steps_remaining > 0) // haven't reached the desired level of seperation yet.
@@ -40,17 +40,19 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
         {
           reachable[person_get_index(acquaintance)] = true; // mark new users as visited. done here to remove redundant loops at the beginning of the function.
           newfrontier[newFrontierSize] = acquaintance;      // add the new person to the new frontier
-          newFrontierSize++;                                // update the size of the frontier to reflect the new added person.
+          count++;
+          newFrontierSize++; // update the size of the frontier to reflect the new added person.
         }
       }
     }
-    free(frontier);                                                                         // free the memory of the out of date frontier.
-    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize); // recurse until you have preformed the desired amount of iterations.
+    free(frontier);                                                                                // free the memory of the out of date frontier.
+    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize, count); // recurse until you have preformed the desired amount of iterations.
   }
   else
   {
     free(frontier); // have reached the end and just need to remove the last hanging frontier.
   }
+  return count;
 }
 
 // computes the number of people within k degrees of the start person
@@ -70,16 +72,16 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   reachable[person_get_index(start)] = true; // mark the start user as reached.
   count = 0;
   // now search for all people who are reachable with k steps
-  find_reachable_recursive(frontier, k, reachable, 1);
+  count = find_reachable_recursive(frontier, k, reachable, 1, count);
   // all visited people are marked reachable, so count them
 
-  for (int i = 0; i < total_people; i++)
+  /*for (int i = 0; i < total_people; i++)
   {
     if (reachable[i] == true)
     {
       count++;
     }
-  }
+  }*/
   return count;
 }
 
