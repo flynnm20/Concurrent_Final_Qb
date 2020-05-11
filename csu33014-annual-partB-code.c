@@ -34,7 +34,7 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
   // now deal with this person's acquaintances
   if (steps_remaining > 0)
   {
-    struct person **newfrontier;
+    struct person **newfrontier = malloc(sizeof(struct person *) * 500);
     int newFrontierSize = 0; // keep track of new frontier size.
     for (int j = 0; j < frontiersize; j++)
     {
@@ -45,9 +45,8 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
         struct person *acquaintance = person_get_acquaintance(current_person, i);
         if (reachable[person_get_index(acquaintance)] == false) // found new member
         {
-          realloc(frontier, sizeof(frontier) + sizeof(struct person)); // expand the frontier.
+          newfrontier[newFrontierSize] = acquaintance;
           newFrontierSize++;
-          frontier[newFrontierSize - 1] = acquaintance;
         }
       }
     }
