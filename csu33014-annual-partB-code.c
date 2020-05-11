@@ -34,7 +34,7 @@ void find_reachable_recursive(struct person *frontier, int steps_remaining,
   // now deal with this person's acquaintances
   if (steps_remaining > 0)
   {
-    struct person *newfrontier;
+    struct person **newfrontier;
     int newFrontierSize = 0; // keep track of new frontier size.
     for (int j = 0; j < frontiersize; j++)
     {
@@ -61,8 +61,8 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
 {
   bool *reachable;
   int count;
-  int size_of_frontier = 0;                                // keep track of the size of the frontier.
-  struct person *frontier = malloc(sizeof(struct person)); // create a frontier.
+  int size_of_frontier = 0;                                   // keep track of the size of the frontier.
+  struct person **frontier = malloc(sizeof(struct person *)); // create a frontier.
   frontier[0] = start;
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
