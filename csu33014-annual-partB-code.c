@@ -22,7 +22,7 @@ If it hasn't been found then it is added to the frontier and placed with relatio
 Our frontier will be a FIFO stack which we will be added to by all aquantances being . The List of visited will also be a dynamic array. 
 */
 
-void find_reachable_recursive(struct person *frontier, int steps_remaining,
+void find_reachable_recursive(struct person **frontier, int steps_remaining,
                               bool *reachable, int frontiersize)
 {
   // deal with all users on the frontier
