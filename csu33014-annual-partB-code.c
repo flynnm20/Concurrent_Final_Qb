@@ -38,7 +38,7 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
     int newFrontierSize = 0; // keep track of new frontier size.
     for (int j = 0; j < frontiersize; j++)
     {
-      struct person *curent_person = frontier[j];
+      struct person *current_person = frontier[j];
       int num_known = person_get_num_known(current_person);
       for (int i = 0; i < num_known; i++)
       {
@@ -71,7 +71,7 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
     reachable[i] = false;
   }
   // now search for all people who are reachable with k steps
-  find_reachable_recursive(frontier, k, reachable, visited);
+  find_reachable_recursive(frontier, k, reachable, 1);
   // all visited people are marked reachable, so count them
   count = 0;
   for (int i = 0; i < total_people; i++)
