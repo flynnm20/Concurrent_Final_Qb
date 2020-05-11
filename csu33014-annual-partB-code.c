@@ -42,7 +42,7 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
       int num_known = person_get_num_known(current_person);
       for (int i = 0; i < num_known; i++)
       {
-        struct person *acquaintance = person_get_acquaintance(current, i);
+        struct person *acquaintance = person_get_acquaintance(current_person, i);
         if (reachable[person_get_index(acquaintance)] == false) // found new member
         {
           realloc(frontier, sizeof(frontier) + sizeof(struct person)); // expand the frontier.
