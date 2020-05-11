@@ -21,11 +21,15 @@ When an acquaintances is found it is checked if the person has already been visi
 If it hasn't been found then it is added to the frontier and placed with relation to it's number of steps. 
 Our frontier will be a dynamic array which we can add to and sort. The List of visited will also be a dynamic array. 
 */
+
 void find_reachable_recursive(struct person *current, int steps_remaining,
-                              bool *reachable)
+                              bool *reachable, struct person *frontier,
+                              struct person *visited)
 {
   // mark current root person as reachable
   reachable[person_get_index(current)] = true;
+  //add to visited.
+
   // now deal with this person's acquaintances
   if (steps_remaining > 0)
   {
@@ -44,7 +48,9 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   bool *reachable;
   int count;
   struct person *frontier = malloc(sizeof(struct person)); // create a frontier.
-
+  frontier[0] = start;
+  print(frontier[0]);
+  struct person *visited = malloc(sizeof(struct person)); // create a list of visited people.
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
   for (int i = 0; i < total_people; i++)
@@ -53,7 +59,7 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   }
 
   // now search for all people who are reachable with k steps
-  find_reachable_recursive(start, k, reachable);
+  find_reachable_recursive(frontier, k, reachable, visited);
 
   // all visited people are marked reachable, so count them
   count = 0;
