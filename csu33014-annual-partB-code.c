@@ -35,7 +35,7 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
       int num_known = person_get_num_known(frontier[j]);
       for (int i = 0; i < num_known; i++)
       {
-        struct person *acquaintance = person_get_acquaintance(current_person, i);
+        struct person *acquaintance = person_get_acquaintance(frontier[j], i);
         if (reachable[person_get_index(acquaintance)] == false) // found new member
         {
           reachable[person_get_index(acquaintance)] = true; // mark new users as visited.
