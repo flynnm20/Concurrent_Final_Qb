@@ -25,12 +25,6 @@ Our frontier will be a FIFO stack which we will be added to by all aquantances b
 void find_reachable_recursive(struct person **frontier, int steps_remaining,
                               bool *reachable, int frontiersize)
 {
-  // deal with all users on the frontier
-  for (int i = 0; i < frontiersize; i++)
-  {
-    reachable[person_get_index(frontier[i])] = true;
-  }
-  // mark current root person as reachable
   // now deal with this person's acquaintances
   if (steps_remaining > 0)
   {
@@ -44,14 +38,18 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
         struct person *acquaintance = person_get_acquaintance(current_person, i);
         if (reachable[person_get_index(acquaintance)] == false) // found new member
         {
+          reachable[person_get_index(acquaintance)] = true; // mark new users as visited.
           newfrontier[newFrontierSize] = acquaintance;
           newFrontierSize++;
         }
       }
     }
     free(frontier);
-    printf((string)newFrontierSize);
     find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize);
+  }
+  else
+  {
+    free(frontier);
   }
 }
 
@@ -69,6 +67,7 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   {
     reachable[i] = false;
   }
+  reachable[person_get_index(start)] = true; // mark new users as visited.
   // now search for all people who are reachable with k steps
   find_reachable_recursive(frontier, k, reachable, 1);
   // all visited people are marked reachable, so count them
