@@ -23,33 +23,34 @@ Our frontier will be a FIFO stack which we will be added to by all aquantances b
 */
 
 void find_reachable_recursive(struct person **frontier, int steps_remaining,
-                              bool *reachable, int frontiersize)
+                              bool *reachable, int frontiersize, int count)
 {
   // now deal with this person's acquaintances
-  if (steps_remaining > 0)
+  if (steps_remaining > 0) // haven't reached the desired level of seperation yet.
   {
-    struct person **newfrontier = malloc(sizeof(struct person *) * 500);
-    int newFrontierSize = 0; // keep track of new frontier size.
-    for (int j = 0; j < frontiersize; j++)
+    struct person **newfrontier = malloc(sizeof(struct person *) * 500); // generate space for a new frontier.
+    int newFrontierSize = 0;                                             // keep track of new frontier size.
+    for (int j = 0; j < frontiersize; j++)                               // loop through all the eelements in the frontier.
     {
-      int num_known = person_get_num_known(frontier[j]);
-      for (int i = 0; i < num_known; i++)
+      int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
+      for (int i = 0; i < num_known; i++)                // loop through all acquaintances
       {
-        struct person *acquaintance = person_get_acquaintance(frontier[j], i);
-        if (reachable[person_get_index(acquaintance)] == false) // found new member
+        struct person *acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
+        if (reachable[person_get_index(acquaintance)] == false)                // found new person which hasn't been noted.
         {
-          reachable[person_get_index(acquaintance)] = true; // mark new users as visited.
-          newfrontier[newFrontierSize] = acquaintance;
-          newFrontierSize++;
+          reachable[person_get_index(acquaintance)] = true; // mark new users as visited. done here to remove redundant loops at the beginning of the function.
+          newfrontier[newFrontierSize] = acquaintance;      // add the new person to the new frontier
+          count++;                                          // kep track of the number of people visited
+          newFrontierSize++;                                // update the size of the frontier to reflect the new added person.
         }
       }
     }
-    free(frontier);
-    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize);
+    free(frontier);                                                                         // free the memory of the out of date frontier.
+    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize); // recurse until you have preformed the desired amount of iterations.
   }
   else
   {
-    free(frontier);
+    free(frontier); // have reached the end and just need to remove the last hanging frontier.
   }
 }
 
@@ -67,18 +68,10 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   {
     reachable[i] = false;
   }
-  reachable[person_get_index(start)] = true; // mark new users as visited.
+  reachable[person_get_index(start)] = true; // mark the start user as reached.
+  count = 1;                                 // kep track of the people being reached to remove redundant for loop.
   // now search for all people who are reachable with k steps
-  find_reachable_recursive(frontier, k, reachable, 1);
-  // all visited people are marked reachable, so count them
-  count = 0;
-  for (int i = 0; i < total_people; i++)
-  {
-    if (reachable[i] == true)
-    {
-      count++;
-    }
-  }
+  find_reachable_recursive(frontier, k, reachable, 1, total_people_reaahced);
   return count;
 }
 
