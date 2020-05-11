@@ -45,8 +45,8 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
         }
       }
     }
-    free(frontier);                                                                         // free the memory of the out of date frontier.
-    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize); // recurse until you have preformed the desired amount of iterations.
+    free(frontier);                                                                                // free the memory of the out of date frontier.
+    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize, count); // recurse until you have preformed the desired amount of iterations.
   }
   else
   {
@@ -71,7 +71,7 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   reachable[person_get_index(start)] = true; // mark the start user as reached.
   count = 1;                                 // kep track of the people being reached to remove redundant for loop.
   // now search for all people who are reachable with k steps
-  find_reachable_recursive(frontier, k, reachable, 1, total_people_reaahced);
+  find_reachable_recursive(frontier, k, reachable, 1, count);
   return count;
 }
 
