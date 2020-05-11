@@ -50,7 +50,7 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
       }
     }
     free(frontier);
-    printf(newFrontierSize);
+    printf((string)newFrontierSize);
     find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize);
   }
 }
