@@ -22,7 +22,6 @@ If it hasn't been found then it is added to the frontier and placed with relatio
 Our frontier will be a FIFO stack which we will be added to by all aquantances being. The List of visited will also be a dynamic array. 
 */
 
-int count;
 void find_reachable_recursive(struct person **frontier, int steps_remaining,
                               bool *reachable, int frontiersize)
 {
@@ -41,7 +40,6 @@ void find_reachable_recursive(struct person **frontier, int steps_remaining,
         {
           reachable[person_get_index(acquaintance)] = true; // mark new users as visited. done here to remove redundant loops at the beginning of the function.
           newfrontier[newFrontierSize] = acquaintance;      // add the new person to the new frontier
-          count++;                                          // kep track of the number of people visited
           newFrontierSize++;                                // update the size of the frontier to reflect the new added person.
         }
       }
@@ -70,9 +68,18 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
     reachable[i] = false;
   }
   reachable[person_get_index(start)] = true; // mark the start user as reached.
-  count = 1;                                 // kep track of the people being reached to remove redundant for loop.
+  count = 0;                  // kep track of the people being reached to remove redundant for loop.
   // now search for all people who are reachable with k steps
-  find_reachable_recursive(frontier, k, reachable, 1);
+  find_reachable_recursive(frontier, k, reachable, 1, total_people_reaahced);
+  // all visited people are marked reachable, so count them
+  
+  for (int i = 0; i < total_people; i++)
+  {
+    if (reachable[i] == true)
+    {
+      count++;
+    }
+  }
   return count;
 }
 
