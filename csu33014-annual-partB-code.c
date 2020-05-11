@@ -68,11 +68,11 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
     reachable[i] = false;
   }
   reachable[person_get_index(start)] = true; // mark the start user as reached.
-  count = 0;                  // kep track of the people being reached to remove redundant for loop.
+  count = 0;
   // now search for all people who are reachable with k steps
-  find_reachable_recursive(frontier, k, reachable, 1, total_people_reaahced);
+  find_reachable_recursive(frontier, k, reachable, 1);
   // all visited people are marked reachable, so count them
-  
+
   for (int i = 0; i < total_people; i++)
   {
     if (reachable[i] == true)
