@@ -78,8 +78,8 @@ int find_reachable_recursive_less_redundant(struct person **frontier, int steps_
         }
       }
     }
-    free(frontier);                                                                                               // free the memory of the out of date frontier.
-    find_reachable_recursive_less_redundant(newfrontier, steps_remaining - 1, reachable, newFrontierSize, count); // recurse until you have preformed the desired amount of iterations.
+    free(frontier);                                                                                                               // free the memory of the out of date frontier.
+    count = count + find_reachable_recursive_less_redundant(newfrontier, steps_remaining - 1, reachable, newFrontierSize, count); // recurse until you have preformed the desired amount of iterations.
   }
   else
   {
@@ -104,7 +104,6 @@ int less_redundant_number_within_k_degrees(struct person *start,
   {
     reachable[i] = false;
   }
-
   reachable[person_get_index(start)] = true; // mark the start user as reached.
   count = 0;
   // now search for all people who are reachable with k steps
