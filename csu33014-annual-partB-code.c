@@ -200,12 +200,11 @@ void find_reachable_recursive_parrallel(struct person **frontier, int steps_rema
     struct person **newfrontier = malloc(sizeof(struct person *) * 500); // generate space for a new frontier.
     int newFrontierSize = 0;                                             // keep track of new frontier size.
     struct person *acquaintance;                                         // don't need to define this constantly
-    int j, i;
-#pragma omp parallel private(i, j, acquaintance) shared(reachable, newfrontier, newFrontierSize)
-    for (j = 0; j < frontiersize; j++) // loop through all the elements in the frontier.
+#pragma omp parallel private(acquaintance) shared(reachable, newfrontier, newFrontierSize)
+    for (int j = 0; j < frontiersize; j++) // loop through all the elements in the frontier.
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
-      for (i = 0; i < num_known; i++)                    // loop through all acquaintances
+      for (int i = 0; i < num_known; i++)                    // loop through all acquaintances
       {
         acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
         if (reachable[person_get_index(acquaintance)] == false) // found new person which hasn't been noted.
