@@ -72,8 +72,20 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   iterated through every time.
     Once the new frontier has been created the old frontier memory is freed up to prevent usage of too much memory. Once that is done it enters 
   find_reachable_recursive_less_redundant with a new frontier, the steps remaining reduced by 1 and an updated reacable and frontier size. These changes mean that 
-  there is no revisiting people already visited. Because of the frontier search there is a massive increase to the speed of the program. for small examples the
-  speed can be almost 100 times faster and for larger ones, there is massive speedup however there is also  
+  there is no revisiting people already visited. Because of the frontier search there is a massive increase to the speed of the program. For small examples the
+  speed can be almost 100 times faster. For make time my program is about 8 times faster.
+  3 examples "make time"
+  Correct : 740067
+  Less redundant: 99172
+
+  correct: 61252
+  less redundant: 35491
+
+  correct: 264613
+  less redundant: 68809
+
+  These are all of course depending on the random graph generated. However barring some extremely unusual graphs. The less redundant version is consistantly 
+  much faster then the orignal.
 */
 void find_reachable_recursive_less_redundant(struct person **frontier, int steps_remaining,
                                              bool *reachable, int frontiersize)
@@ -150,12 +162,23 @@ int less_redundant_number_within_k_degrees(struct person *start,
     The parrallisation of the system only really comes into effect when the number of people used is very high. I tested a 100 million and I saw.
   significat increases in the time it takes to run the program compared to my efficient version. This is due to the frontiers generally being small
   and thus most of the openmp stuff is simply creating overhead which isn't being outweighed by the current speed of the program. In generall I 
-  found when running make time, the on an average run the parralised process took approximately 7% more time to complete then the efficient 
+  found when running make time, the on an average run the parralised process took approximately 2% more time to complete then the efficient 
   version. When i ran for 100 million 10 then the parrallelised program was approximately twice as fast as the efficient version.
     In conclusion due to the construction of my optimized code, requiring few loops which are suitable for parralisation and when it is implemented
   it only increases overhead until the population of the graph is high enough. At which point the Openmp aspects stop contributing to overhead
   and make the system significantly faster then running it without them.
-    
+  3 Examples of make time:
+  Correct : 740067
+  Less redundant: 99172
+  Parallel : 100508
+
+  correct: 61252
+  less redundant: 35491
+  Parallel : 37317
+
+  correct: 264613
+  less redundant: 68809
+  Parallel : 100508
 */
 int parallel_number_within_k_degrees(struct person *start,
                                      int total_people, int k)
@@ -168,7 +191,8 @@ int parallel_number_within_k_degrees(struct person *start,
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
   // independent so can use parallel for loop
-  //#pragma omp parallel for shared(reachable)
+  // could potentially add here however would cause increased overhead when
+  // running for a small number of people.
   for (int i = 0; i < total_people; i++)
   {
     reachable[i] = false;
@@ -179,8 +203,8 @@ int parallel_number_within_k_degrees(struct person *start,
   // now search for all people who are reachable with k steps
   find_reachable_recursive_less_redundant(frontier, k, reachable, 1);
   // all visited people are marked reachable, so count them
-  //no dependencies so can use parallel for
-  //#pragma omp parallel for
+  //no dependencies so can use parallel for however this will cause a lot of
+  //overhead without much payoff until the total people is very large.
   for (int i = 0; i < total_people; i++)
   {
     if (reachable[i] == true)
@@ -200,11 +224,12 @@ void find_reachable_recursive_parrallel(struct person **frontier, int steps_rema
     struct person **newfrontier = malloc(sizeof(struct person *) * 500); // generate space for a new frontier.
     int newFrontierSize = 0;                                             // keep track of new frontier size.
     struct person *acquaintance;                                         // don't need to define this constantly
+// acquaintance must be kept private but all other variables are able to be shared.
 #pragma omp parallel private(acquaintance) shared(reachable, newfrontier, newFrontierSize)
     for (int j = 0; j < frontiersize; j++) // loop through all the elements in the frontier.
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
-      for (int i = 0; i < num_known; i++)                    // loop through all acquaintances
+      for (int i = 0; i < num_known; i++)                // loop through all acquaintances
       {
         acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
         if (reachable[person_get_index(acquaintance)] == false) // found new person which hasn't been noted.
