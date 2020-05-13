@@ -56,22 +56,24 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
 }
 
 /* Q B 1: Explaination comments: Name: Matthew Flynn  Student Number :17327199
-  In order to remove redunndency we need to remove the repeatly searching the same seen people. To do this I decided to use a modified frontier seach.
-  We start at the start person. We then create a frontier which we will be adding to as the process continues. We also create an array of booleans to 
-  keep track of which people have already been viewed. The start person is marked as visited and all other values in reached are marked as false.
-  The main actions are preformed in the find reachable recursive less redundant function. This has been modiefied from the find_reachable_recursive
-  given in the question. 
-    find_reachable_recursive_less_redundant preformes one of 2 actions; creates a new frontier based on the acquaintances of the current frontier
-  or it returns as we have reached the k'th step away from the user. In the case where we haven't reached the end, the function creates a new frontier 
-  which it populates with the acquaintances of the previous frontier which haven't been seen. If the acquaintance hasn't been seen then it is added to the 
-  new frontier and marked as seen. If it has been seen then it is passed over.There is also a tracker for the size of the new frontier as I found it was 
-  easier to create a large consistantly sized block of memmemory which the frontier can populate and has enough memory to story 500 people pointers.
-  If we were forced to work with much larger data sets I would have implemented a dianamic memory allocation function however that was not necessary for the
-  test values provided. 
+  In order to remove redunndency we need to remove the repeatly searching the same seen people. To do this I decided to programme a modified frontier seach.
+  We start at the start person and create an We also create an array of booleans to keep track of which people have already been viewed. The array reached is 
+  then initalised to false and afterwards the start person is initalised to true. We do this hear instead of within the frontier loop as it allows us to remove
+  a redundant for loop within the find_reachable_recursive_less_redundant routine. We then create a frontier which we will be adding to as the process continues.
+  The start person is added to the frontier.The main actions are preformed in the find reachable recursive less redundant function. This has been modiefied 
+  from the find_reachable_recursive(). It now has 4 parameters the frontier, steps_remaining, reachable, frontiersize. For our first iteration the frontiersize 
+  is given a 1 value. 
+    find_reachable_recursive_less_redundant preformes one of 2 actions; creates a new frontier based on the acquaintances of the current frontier or it returns 
+  as we have reached the k'th step away from the user. In the case where we haven't reached the end, the function creates a new frontier which it populates with 
+  the acquaintances of the previous frontier which haven't been seen. I created a large frontier using malloc. The frontier can store up to 800000 people 
+  pointers. This level frontier can handle huge populations as a result. Using the frontier size as the limit for the first for loop the program looks through the frontier
+  To see how many acquaintances the person has. This number as the limit for the inner for loop. If it has been seen then it is passed over. If they haven't 
+  been reached before then they are added to the frontier, are marked as reached and the size of the new frontier is updated so the whole frontier space isn't 
+  iterated through every time.
     Once the new frontier has been created the old frontier memory is freed up to prevent usage of too much memory. Once that is done it enters 
-  find_reachable_recursive_less_redundant with a new frontier, the steps remaining reduced by 1 and an updated reacable and frontier size. These 
-  changes mean that there is no revisiting people already visited. 
-  Because of the frontier search the complexity as become O(N log N). 
+  find_reachable_recursive_less_redundant with a new frontier, the steps remaining reduced by 1 and an updated reacable and frontier size. These changes mean that 
+  there is no revisiting people already visited. Because of the frontier search there is a massive increase to the speed of the program. for small examples the
+  speed can be almost 100 times faster and for larger ones, there is massive speedup however there is also  
 */
 void find_reachable_recursive_less_redundant(struct person **frontier, int steps_remaining,
                                              bool *reachable, int frontiersize)
@@ -147,9 +149,12 @@ int less_redundant_number_within_k_degrees(struct person *start,
   being looked at. This means there is very little speedup within the for loop when dealing with users which need to be added to the frontier.
     The parrallisation of the system only really comes into effect when the number of people used is very high. I tested a 100 million and I saw.
   significat increases in the time it takes to run the program compared to my efficient version. This is due to the frontiers generally being small
-  and thus most of the openmp stuff is simply creating overhead which isn't being outweighed by the current speed of the program. 
-    In conclusion due to the construction of my optimized code, requiring few loops which are suitable for parralisation there is very little 
-  effect to adding parallisation. Inmost of my test cases the parallelization made the program slower and didn't  
+  and thus most of the openmp stuff is simply creating overhead which isn't being outweighed by the current speed of the program. In generall I 
+  found when running make time, the on an average run the parralised process took approximately 7% more time to complete then the efficient 
+  version. When i ran for 100 million 10 then the parrallelised program was approximately twice as fast as the efficient version.
+    In conclusion due to the construction of my optimized code, requiring few loops which are suitable for parralisation and when it is implemented
+  it only increases overhead until the population of the graph is high enough. At which point the Openmp aspects stop contributing to overhead
+  and make the system significantly faster then running it without them.
     
 */
 int parallel_number_within_k_degrees(struct person *start,
@@ -195,11 +200,11 @@ void find_reachable_recursive_parrallel(struct person **frontier, int steps_rema
     struct person **newfrontier = malloc(sizeof(struct person *) * 500); // generate space for a new frontier.
     int newFrontierSize = 0;                                             // keep track of new frontier size.
     struct person *acquaintance;                                         // don't need to define this constantly
-    for (int j = 0; j < frontiersize; j++)                               // loop through all the elements in the frontier.
+#pragma omp parallel private(i, j, acquaintance) shared(reachable, newfrontier, newFrontierSize)
+    for (int j = 0; j < frontiersize; j++) // loop through all the elements in the frontier.
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
-#pragma omp parallel private(acquaintance) shared(newfrontier, newFrontierSize)
-      for (int i = 0; i < num_known; i++) // loop through all acquaintances
+      for (int i = 0; i < num_known; i++)                // loop through all acquaintances
       {
         acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
         if (reachable[person_get_index(acquaintance)] == false) // found new person which hasn't been noted.
