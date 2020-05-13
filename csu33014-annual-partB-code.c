@@ -145,7 +145,7 @@ int less_redundant_number_within_k_degrees(struct person *start,
   new frontier. The new frontier variable must remain private for whoever is using it and thus so must the new frontier size and the acquaintance 
   being looked at. This means there is very little speedup within the for loop when dealing with users which need to be added to the frontier.
     The third part of the parallization occurs when we are counting the amount of users that are reachable. This is a very easy part to 
-    parallise as there are no dependent values and it is simply iterating based on whether the value is true or false.  
+  parallise as there are no dependent values and it is simply iterating based on whether the value is true or false.  
     
 */
 int parallel_number_within_k_degrees(struct person *start,
@@ -164,13 +164,14 @@ int parallel_number_within_k_degrees(struct person *start,
   {
     reachable[i] = false;
   }
+
   reachable[person_get_index(start)] = true; // mark the start user as reached.
   count = 0;
   // now search for all people who are reachable with k steps
   find_reachable_recursive_less_redundant(frontier, k, reachable, 1);
   // all visited people are marked reachable, so count them
   //no dependencies so can use parallel for
-#pragma omp parallel for
+  //#pragma omp parallel for
   for (int i = 0; i < total_people; i++)
   {
     if (reachable[i] == true)
