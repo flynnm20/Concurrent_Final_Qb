@@ -79,10 +79,10 @@ void find_reachable_recursive_less_redundant(struct person **frontier, int steps
   // now deal with this person's acquaintances
   if (steps_remaining > 0) // haven't reached the desired level of seperation yet.
   {
-    struct person **newfrontier = malloc(sizeof(struct person *) * 500); // generate space for a new frontier.
-    int newFrontierSize = 0;                                             // keep track of new frontier size.
-    struct person *acquaintance;                                         // don't need to define this constantly
-    for (int j = 0; j < frontiersize; j++)                               // loop through all the elements in the frontier.
+    struct person **newfrontier = malloc(sizeof(struct person *) * 800000); // generate space for a new frontier.
+    int newFrontierSize = 0;                                                // keep track of new frontier size.
+    struct person *acquaintance;                                            // don't need to define this constantly
+    for (int j = 0; j < frontiersize; j++)                                  // loop through all the elements in the frontier.
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
       for (int i = 0; i < num_known; i++)                // loop through all acquaintances
@@ -137,12 +137,15 @@ int less_redundant_number_within_k_degrees(struct person *start,
 }
 
 /* Q B 2: Explaination comments: Name: Matthew Flynn  Student Number :17327199
-  When implementing the code in parrallel there are many things to consider. I am using the frontier program I used in part 1 as it is efficient 
+  When implementing the code in parallel there are many things to consider. I am using the frontier program I used in part 1 as it is efficient 
   and has very little dependencies across loops. There are 3 points where we can parallise the functions. The first is the initalisation of the
   reachable bool array. There are no dependencies and it will speed up the initalisation.
-    The second parallel loop that is possible is when handling the aquaintance of the people within the frontier. This allows us to quickly move 
-  through all the seen users and focus on the ones which haven't been used yet. Unfortuantly there are some dependencies when adding them to the 
-  new frontier. The new frontier variable must remain private for whoever is using it. This means that we must keep 
+    The second parallel loop that is possible is when handling the acquaintance of the people within the frontier. This allows us to quickly move 
+  through all the seen users and focus on the ones which haven't been used yet. Unfortuantly, there are some dependencies when adding them to the 
+  new frontier. The new frontier variable must remain private for whoever is using it and thus so must the new frontier size and the acquaintance 
+  being looked at. This means there is very little speedup within the for loop when dealing with users which need to be added to the frontier.
+    The third part of the parallization occurs when we are counting the amount of users that are reachable. This is a very easy part to 
+    parallise as there are no dependent values and it is simply iterating based on whether the value is true or false.  
     
 */
 int parallel_number_within_k_degrees(struct person *start,
