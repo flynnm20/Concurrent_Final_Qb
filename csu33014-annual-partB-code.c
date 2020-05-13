@@ -145,6 +145,7 @@ int less_redundant_number_within_k_degrees(struct person *start,
   through all the seen users and focus on the ones which haven't been used yet. Unfortuantly, there are some dependencies when adding them to the 
   new frontier. The new frontier variable must remain private for whoever is using it and thus so must the new frontier size and the acquaintance 
   being looked at. This means there is very little speedup within the for loop when dealing with users which need to be added to the frontier.
+    The parrallisation of the system only really comes into effect when the number of people used is very high. I tested a 100 million and i saw
     In conclusion due to the construction of my optimized code, requiring few loops which are suitable for parralisation there is very little 
   effect to adding parallisation. Inmost of my test cases the parallelization made the program slower and didn't  
     
@@ -192,12 +193,11 @@ void find_reachable_recursive_parrallel(struct person **frontier, int steps_rema
     struct person **newfrontier = malloc(sizeof(struct person *) * 500); // generate space for a new frontier.
     int newFrontierSize = 0;                                             // keep track of new frontier size.
     struct person *acquaintance;                                         // don't need to define this constantly
-    for (int j = 0; j < frontiersize; j++)                               // loop through all the elements in the frontier.
+#pragma omp parallel
+    for (int j = 0; j < frontiersize; j++) // loop through all the elements in the frontier.
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
-// each aquaintance is independent. However the aquantance newFrontierSize newFrontierSize and must be made private to prevent version.
-#pragma omp parallel                      //private(acquaintance)
-      for (int i = 0; i < num_known; i++) // loop through all acquaintances
+      for (int i = 0; i < num_known; i++)                // loop through all acquaintances
       {
         acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
         if (reachable[person_get_index(acquaintance)] == false) // found new person which hasn't been noted.
