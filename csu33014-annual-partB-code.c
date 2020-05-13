@@ -104,12 +104,12 @@ int less_redundant_number_within_k_degrees(struct person *start,
   {
     reachable[i] = false;
   }
+
   reachable[person_get_index(start)] = true; // mark the start user as reached.
   count = 0;
   // now search for all people who are reachable with k steps
-  count = find_reachable_recursive_less_redundant((frontier, k, reachable, 1, count);
+  count = find_reachable_recursive_less_redundant(frontier, k, reachable, 1, count);
   // all visited people are marked reachable, so count them
-
   /*for (int i = 0; i < total_people; i++)
   {
     if (reachable[i] == true)
