@@ -138,14 +138,15 @@ int less_redundant_number_within_k_degrees(struct person *start,
 
 /* Q B 2: Explaination comments: Name: Matthew Flynn  Student Number :17327199
   When implementing the code in parallel there are many things to consider. I am using the frontier program I used in part 1 as it is efficient 
-  and has very little dependencies across loops. There are 3 points where we can parallise the functions. The first is the initalisation of the
-  reachable bool array. There are no dependencies and it will speed up the initalisation.
+  and has very little dependencies across loops. There are 2 points where we can parallise the functions. 
+    The first is the initalisation of the reachable bool array. There are no dependencies and it will speed up the initalisation. There is not
+  much to really say about it. 
     The second parallel loop that is possible is when handling the acquaintance of the people within the frontier. This allows us to quickly move 
   through all the seen users and focus on the ones which haven't been used yet. Unfortuantly, there are some dependencies when adding them to the 
   new frontier. The new frontier variable must remain private for whoever is using it and thus so must the new frontier size and the acquaintance 
   being looked at. This means there is very little speedup within the for loop when dealing with users which need to be added to the frontier.
-    The third part of the parallization occurs when we are counting the amount of users that are reachable. This is a very easy part to 
-  parallise as there are no dependent values and it is simply iterating based on whether the value is true or false.  
+    In conclusion due to the construction of my optimized code, requiring few loops which are suitable for parralisation there is very little 
+  effect to adding parallisation. Inmost of my test cases the parallelization made the program slower and didn't  
     
 */
 int parallel_number_within_k_degrees(struct person *start,
@@ -159,7 +160,7 @@ int parallel_number_within_k_degrees(struct person *start,
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
 // independent so can use parallel for loop
-#pragma omp parallel for
+#pragma omp parallel for shared(reachable)
   for (int i = 0; i < total_people; i++)
   {
     reachable[i] = false;
@@ -195,8 +196,8 @@ void find_reachable_recursive_parrallel(struct person **frontier, int steps_rema
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
 // each aquaintance is independent. However the aquantance newFrontierSize newFrontierSize and must be made private to prevent version.
-#pragma omp parallel private(acquaintance) //newFrontierSize, newfrontier)
-      for (int i = 0; i < num_known; i++)  // loop through all acquaintances
+#pragma omp parallel private(acquaintance)
+      for (int i = 0; i < num_known; i++) // loop through all acquaintances
       {
         acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
         if (reachable[person_get_index(acquaintance)] == false) // found new person which hasn't been noted.
