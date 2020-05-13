@@ -160,8 +160,8 @@ int parallel_number_within_k_degrees(struct person *start,
   frontier[0] = start;
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
-// independent so can use parallel for loop
-#pragma omp parallel for shared(reachable)
+  // independent so can use parallel for loop
+  //#pragma omp parallel for shared(reachable)
   for (int i = 0; i < total_people; i++)
   {
     reachable[i] = false;
