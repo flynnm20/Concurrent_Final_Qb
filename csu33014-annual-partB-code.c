@@ -194,7 +194,7 @@ void find_reachable_recursive_parrallel(struct person **frontier, int steps_rema
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
                                                          // each aquaintance is independent. However the aquantance newFrontierSize newFrontierSize and must be made private to prevent version.
-#pragma omp parallel private(aquaintance, newFrontierSize, newfrontier)
+#pragma omp parallel private(acquaintance, newFrontierSize, newfrontier)
       for (int i = 0; i < num_known; i++) // loop through all acquaintances
       {
         acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
