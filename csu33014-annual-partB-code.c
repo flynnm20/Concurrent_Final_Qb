@@ -63,13 +63,14 @@ int find_reachable_recursive_less_redundant(struct person **frontier, int steps_
   {
     struct person **newfrontier = malloc(sizeof(struct person *) * 500); // generate space for a new frontier.
     int newFrontierSize = 0;                                             // keep track of new frontier size.
-    for (int j = 0; j < frontiersize; j++)                               // loop through all the eelements in the frontier.
+    struct person *acquaintance;
+    for (int j = 0; j < frontiersize; j++) // loop through all the eelements in the frontier.
     {
       int num_known = person_get_num_known(frontier[j]); // get the number of acquaintances a person has
       for (int i = 0; i < num_known; i++)                // loop through all acquaintances
       {
-        struct person *acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
-        if (reachable[person_get_index(acquaintance)] == false)                // found new person which hasn't been noted.
+        acquaintance = person_get_acquaintance(frontier[j], i); // get acquaintance pointer
+        if (reachable[person_get_index(acquaintance)] == false) // found new person which hasn't been noted.
         {
           reachable[person_get_index(acquaintance)] = true; // mark new users as visited. done here to remove redundant loops at the beginning of the function.
           newfrontier[newFrontierSize] = acquaintance;      // add the new person to the new frontier
