@@ -71,7 +71,7 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
     Once the new frontier has been created the old frontier memory is freed up to prevent usage of too much memory. Once that is done it enters 
   find_reachable_recursive_less_redundant with a new frontier, the steps remaining reduced by 1 and an updated reacable and frontier size. These 
   changes mean that there is no revisiting people already visited. 
-  Because of the frontier search the complexity as become 
+  Because of the frontier search the complexity as become O(N log N). 
 */
 void find_reachable_recursive_less_redundant(struct person **frontier, int steps_remaining,
                                              bool *reachable, int frontiersize)
@@ -137,8 +137,13 @@ int less_redundant_number_within_k_degrees(struct person *start,
 }
 
 /* Q B 2: Explaination comments: Name: Matthew Flynn  Student Number :17327199
-  When implementing the code in parrallel there are many things to consider. 
-
+  When implementing the code in parrallel there are many things to consider. I am using the frontier program I used in part 1 as it is efficient 
+  and has very little dependencies across loops. There are 3 points where we can parallise the functions. The first is the initalisation of the
+  reachable bool array. There are no dependencies and it will speed up the initalisation.
+    The second parallel loop that is possible is when handling the aquaintance of the people within the frontier. This allows us to quickly move 
+  through all the seen users and focus on the ones which haven't been used yet. Unfortuantly there are some dependencies when adding them to the 
+  new frontier. The new frontier variable must remain private for whoever is using it. This means that we must keep 
+    
 */
 int parallel_number_within_k_degrees(struct person *start,
                                      int total_people, int k)
@@ -150,7 +155,7 @@ int parallel_number_within_k_degrees(struct person *start,
   frontier[0] = start;
   // maintain a boolean flag for each person indicating if they are visited
   reachable = malloc(sizeof(bool) * total_people);
-// independent so can use open mp
+// independent so can use parallel for loop
 #pragma omp parallel for
   for (int i = 0; i < total_people; i++)
   {
@@ -161,6 +166,7 @@ int parallel_number_within_k_degrees(struct person *start,
   // now search for all people who are reachable with k steps
   find_reachable_recursive_less_redundant(frontier, k, reachable, 1);
   // all visited people are marked reachable, so count them
+  //no dependencies so can use parallel for
 #pragma omp parallel for
   for (int i = 0; i < total_people; i++)
   {
