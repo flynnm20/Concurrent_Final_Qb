@@ -161,6 +161,7 @@ int parallel_number_within_k_degrees(struct person *start,
   // now search for all people who are reachable with k steps
   find_reachable_recursive_less_redundant(frontier, k, reachable, 1);
   // all visited people are marked reachable, so count them
+#pragma omp parallel for
   for (int i = 0; i < total_people; i++)
   {
     if (reachable[i] == true)
