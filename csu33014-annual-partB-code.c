@@ -78,8 +78,8 @@ int find_reachable_recursive_less_redundant(struct person **frontier, int steps_
         }
       }
     }
-    free(frontier);                                                                                // free the memory of the out of date frontier.
-    find_reachable_recursive(newfrontier, steps_remaining - 1, reachable, newFrontierSize, count); // recurse until you have preformed the desired amount of iterations.
+    free(frontier);                                                                                               // free the memory of the out of date frontier.
+    find_reachable_recursive_less_redundant(newfrontier, steps_remaining - 1, reachable, newFrontierSize, count); // recurse until you have preformed the desired amount of iterations.
   }
   else
   {
