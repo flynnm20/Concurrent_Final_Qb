@@ -55,8 +55,8 @@ int number_within_k_degrees(struct person *start, int total_people, int k)
   return count;
 }
 
-int find_reachable_recursive(struct person **frontier, int steps_remaining,
-                             bool *reachable, int frontiersize, int count)
+int find_reachable_recursive_less_redundant(struct person **frontier, int steps_remaining,
+                                            bool *reachable, int frontiersize, int count)
 {
   // now deal with this person's acquaintances
   if (steps_remaining > 0) // haven't reached the desired level of seperation yet.
@@ -107,7 +107,7 @@ int less_redundant_number_within_k_degrees(struct person *start,
   reachable[person_get_index(start)] = true; // mark the start user as reached.
   count = 0;
   // now search for all people who are reachable with k steps
-  count = find_reachable_recursive(frontier, k, reachable, 1, count);
+  count = find_reachable_recursive_less_redundant((frontier, k, reachable, 1, count);
   // all visited people are marked reachable, so count them
 
   /*for (int i = 0; i < total_people; i++)
